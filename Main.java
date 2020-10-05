@@ -2,29 +2,22 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args){
-        File f = new File(args[0]);
-        String content = getFileContent(f);
-        LexicalAnalysis l = new LexicalAnalysis(content);
-        ArrayList<Lexi> res = l.getSym();
+        try{
+            File f = new File(args[0]);
+            String content = getFileContent(f);
+            LexicalAnalysis l = new LexicalAnalysis(content);
+            ArrayList<Lexi> res = l.getSym();
 
-        for(Lexi i: res){
-            System.out.println(i);
-            if(i.toString().equals("Unknown"))
-                break;
+            for(Lexi i: res){
+                System.out.println(i);
+                if(i.toString().equals("Unknown"))
+                    break;
+            }
+        } catch (Exception ignored){
         }
-
-
-/*
-        Scanner sc = new Scanner(System.in);
-        String str = sc.nextLine();
-        LexicalAnalysis l = new LexicalAnalysis(str);
-        System.out.println(l.getSym());
-        */
 
     }
 
