@@ -40,7 +40,7 @@ public final class Analyser {
 
     /**
      * 查看下一个 Token
-     * 
+     *
      * @return
      * @throws TokenizeError
      */
@@ -53,7 +53,7 @@ public final class Analyser {
 
     /**
      * 获取下一个 Token
-     * 
+     *
      * @return
      * @throws TokenizeError
      */
@@ -69,7 +69,7 @@ public final class Analyser {
 
     /**
      * 如果下一个 token 的类型是 tt，则返回 true
-     * 
+     *
      * @param tt
      * @return
      * @throws TokenizeError
@@ -81,7 +81,7 @@ public final class Analyser {
 
     /**
      * 如果下一个 token 的类型是 tt，则前进一个 token 并返回这个 token
-     * 
+     *
      * @param tt 类型
      * @return 如果匹配则返回这个 token，否则返回 null
      * @throws TokenizeError
@@ -97,7 +97,7 @@ public final class Analyser {
 
     /**
      * 如果下一个 token 的类型是 tt，则前进一个 token 并返回，否则抛出异常
-     * 
+     *
      * @param tt 类型
      * @return 这个 token
      * @throws CompileError 如果类型不匹配
@@ -113,7 +113,7 @@ public final class Analyser {
 
     /**
      * 获取下一个变量的栈偏移
-     * 
+     *
      * @return
      */
     private int getNextVariableOffset() {
@@ -122,7 +122,7 @@ public final class Analyser {
 
     /**
      * 添加一个符号
-     * 
+     *
      * @param name          名字
      * @param isInitialized 是否已赋值
      * @param isConstant    是否是常量
@@ -139,7 +139,7 @@ public final class Analyser {
 
     /**
      * 设置符号为已赋值
-     * 
+     *
      * @param name   符号名称
      * @param curPos 当前位置（报错用）
      * @throws AnalyzeError 如果未定义则抛异常
@@ -155,7 +155,7 @@ public final class Analyser {
 
     /**
      * 获取变量在栈上的偏移
-     * 
+     *
      * @param name   符号名
      * @param curPos 当前位置（报错用）
      * @return 栈偏移
@@ -172,7 +172,7 @@ public final class Analyser {
 
     /**
      * 获取变量是否是常量
-     * 
+     *
      * @param name   符号名
      * @param curPos 当前位置（报错用）
      * @return 是否为常量
@@ -203,7 +203,8 @@ public final class Analyser {
     }
 
     private void analyseMain() throws CompileError {
-        throw new Error("Not implemented");
+        analyseStatementSequence();
+        //throw new Error("Not implemented");
     }
 
     private void analyseConstantDeclaration() throws CompileError {
@@ -212,6 +213,9 @@ public final class Analyser {
         while (nextIf(TokenType.Const) != null) {
             // 变量名
             var nameToken = expect(TokenType.Ident);
+
+            addSymbol(nameToken.getValueString(),
+                    false,true,next().getStartPos());
 
             // 等于号
             expect(TokenType.Equal);
@@ -225,27 +229,71 @@ public final class Analyser {
     }
 
     private void analyseVariableDeclaration() throws CompileError {
-        throw new Error("Not implemented");
+        // 变量声明
+        while (nextIf(TokenType.Var) != null) {
+            // 变量名
+            var nameToken = expect(TokenType.Ident);
+            addSymbol(nameToken.getValueString(),
+                    false,false,next().getStartPos());
+
+            // 等于号
+            expect(TokenType.Equal);
+
+            // 常表达式
+            analyseConstantExpression();
+
+            // 分号
+            expect(TokenType.Semicolon);
+        }
+
+        //throw new Error("Not implemented");
     }
 
     private void analyseStatementSequence() throws CompileError {
-        throw new Error("Not implemented");
+        // 语句序列
+        while(!check(TokenType.End) && !check(TokenType.EOF)){
+            analyseStatement();
+        }
+        //throw new Error("Not implemented");
     }
 
     private void analyseStatement() throws CompileError {
-        throw new Error("Not implemented");
+        // <语句>
+        if(check(TokenType.Print)){
+            analyseOutputStatement();
+        }
+        else if(check(TokenType.Const)){
+            analyseConstantDeclaration();
+        }
+        else{
+            analyseVariableDeclaration();
+        }
+        // throw new Error("Not implemented");
     }
 
     private void analyseConstantExpression() throws CompileError {
-        throw new Error("Not implemented");
+        // 常<表达式>
+        analyseItem();
+        while(nextIf(TokenType.Plus) != null){
+            analyseItem();
+        }
+
+//        throw new Error("Not implemented");
     }
 
     private void analyseExpression() throws CompileError {
-        throw new Error("Not implemented");
+        // <表达式>
+        analyseItem();
+        while(nextIf(TokenType.Plus) != null){
+            analyseItem();
+        }
+        //throw new Error("Not implemented");
     }
 
     private void analyseAssignmentStatement() throws CompileError {
-        throw new Error("Not implemented");
+        // 赋值语句 TODO
+        System.out.println("----------"+next());
+        // throw new Error("Not implemented");
     }
 
     private void analyseOutputStatement() throws CompileError {
@@ -258,10 +306,16 @@ public final class Analyser {
     }
 
     private void analyseItem() throws CompileError {
-        throw new Error("Not implemented");
+        // <项>
+        analyseFactor();
+        while(nextIf(TokenType.Mult) != null){
+            analyseFactor();
+        }
+        // throw new Error("Not implemented");
     }
 
     private void analyseFactor() throws CompileError {
+        // <因子>
         boolean negate;
         if (nextIf(TokenType.Minus) != null) {
             negate = true;
@@ -273,11 +327,17 @@ public final class Analyser {
         }
 
         if (check(TokenType.Ident)) {
-            // 调用相应的处理函数
+            //自定义变量 TODO
+            analyseAssignmentStatement();
         } else if (check(TokenType.Uint)) {
-            // 调用相应的处理函数
+            // 无符号整数
+            analyseAssignmentStatement();
         } else if (check(TokenType.LParen)) {
-            // 调用相应的处理函数
+            // 表达式
+            analyseExpression();
+            if(check(TokenType.RParen)){
+                next();
+            }
         } else {
             // 都不是，摸了
             throw new ExpectedTokenError(List.of(TokenType.Ident, TokenType.Uint, TokenType.LParen), next());
@@ -286,6 +346,6 @@ public final class Analyser {
         if (negate) {
             instructions.add(new Instruction(Operation.SUB));
         }
-        throw new Error("Not implemented");
+        //throw new Error("Not implemented");
     }
 }
