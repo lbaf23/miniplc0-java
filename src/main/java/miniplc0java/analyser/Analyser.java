@@ -279,8 +279,11 @@ public final class Analyser {
         else if(check(TokenType.Ident)){
             analyseAssignmentStatement();
         }
-        else{
+        else if(check(TokenType.Var)){
             analyseVariableDeclaration();
+        }
+        else{ // TODO
+            throw new AnalyzeError(ErrorCode.InvalidIdentifier, peek().getStartPos());
         }
     }
 
@@ -327,7 +330,7 @@ public final class Analyser {
         var nameToken = expect(TokenType.Ident);
         // 等于号
         expect(TokenType.Equal);
-        // 常表达式
+        // 表达式
         analyseExpression();
         // 分号
         expect(TokenType.Semicolon);
@@ -388,8 +391,8 @@ public final class Analyser {
             //自定义变量
             Token n = next();
             int ofst = getOffset(n.getValueString(), n.getStartPos());
-            if(ofst < symbolTable.size()-1 )
-                instructions.add(new Instruction(Operation.LOD, ofst ));
+            //if(ofst < symbolTable.size()-1 )
+            instructions.add(new Instruction(Operation.LOD, ofst ));
 
         } else if (check(TokenType.Uint)) {
             // 无符号整数
