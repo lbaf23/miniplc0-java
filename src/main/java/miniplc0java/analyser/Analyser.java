@@ -335,8 +335,11 @@ public final class Analyser {
         // 分号
         expect(TokenType.Semicolon);
 
+
         int ofst = getOffset(nameToken.getValueString(), nameToken.getStartPos());
 
+        // TODO
+        //if(ofst < symbolTable.size()-1)
         instructions.add(new Instruction(Operation.STO, ofst));
 
         /*
@@ -391,6 +394,7 @@ public final class Analyser {
             //自定义变量
             Token n = next();
             int ofst = getOffset(n.getValueString(), n.getStartPos());
+            // TODO
             //if(ofst < symbolTable.size()-1 )
             instructions.add(new Instruction(Operation.LOD, ofst ));
 
