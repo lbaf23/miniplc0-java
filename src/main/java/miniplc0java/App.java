@@ -18,6 +18,7 @@ import miniplc0java.tokenizer.Token;
 import miniplc0java.tokenizer.TokenType;
 import miniplc0java.tokenizer.Tokenizer;
 
+import miniplc0java.vm.MiniVm;
 import net.sourceforge.argparse4j.*;
 import net.sourceforge.argparse4j.impl.Arguments;
 import net.sourceforge.argparse4j.inf.ArgumentAction;
@@ -98,6 +99,13 @@ public class App {
             List<Instruction> instructions;
             try {
                 instructions = analyzer.analyse();
+/*
+                System.out.println("-----------------MINIVM------------------");
+                MiniVm m = new MiniVm(instructions);
+                m.Run();
+                System.out.println("-----------------------------------------");
+*/
+
             } catch (Exception e) {
                 // 遇到错误不输出，直接退出
                 System.err.println(e);
