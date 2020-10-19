@@ -99,12 +99,12 @@ public class App {
             List<Instruction> instructions;
             try {
                 instructions = analyzer.analyse();
-/*
+
                 System.out.println("-----------------MINIVM------------------");
                 MiniVm m = new MiniVm(instructions);
                 m.Run();
                 System.out.println("-----------------------------------------");
-*/
+
 
             } catch (Exception e) {
                 // 遇到错误不输出，直接退出

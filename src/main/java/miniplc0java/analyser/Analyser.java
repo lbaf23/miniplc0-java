@@ -259,8 +259,6 @@ public final class Analyser {
                 instructions.add(new Instruction(Operation.LIT, 0));
             }
         }
-
-        //throw new Error("Not implemented");
     }
 
     private void analyseStatementSequence() throws CompileError {
@@ -268,7 +266,6 @@ public final class Analyser {
         while(!check(TokenType.End) && !check(TokenType.EOF)){
             analyseStatement();
         }
-        //throw new Error("Not implemented");
     }
 
     private void analyseStatement() throws CompileError {
@@ -285,28 +282,44 @@ public final class Analyser {
         else{
             analyseVariableDeclaration();
         }
-        // throw new Error("Not implemented");
     }
 
     private void analyseConstantExpression() throws CompileError {
         // 常<表达式>
         analyseItem();
-        while(nextIf(TokenType.Plus) != null){
-            analyseItem();
-            instructions.add(new Instruction(Operation.ADD));
-        }
+        while(check(TokenType.Plus) || check(TokenType.Minus) ){
+            Operation o;
+            if(check(TokenType.Plus)){
+                o = Operation.ADD;
+            }
+            else{
+                o = Operation.SUB;
+            }
 
-//        throw new Error("Not implemented");
+            next();
+
+            analyseItem();
+            instructions.add(new Instruction(o));
+        }
     }
 
     private void analyseExpression() throws CompileError {
         // <表达式>
         analyseItem();
-        while(nextIf(TokenType.Plus) != null) {
+        while(check(TokenType.Plus) || check(TokenType.Minus) ){
+            Operation o;
+            if(check(TokenType.Plus)){
+                o = Operation.ADD;
+            }
+            else{
+                o = Operation.SUB;
+            }
+
+            next();
+
             analyseItem();
-            instructions.add(new Instruction(Operation.ADD));
+            instructions.add(new Instruction(o));
         }
-        //throw new Error("Not implemented");
     }
 
     private void analyseAssignmentStatement() throws CompileError {
@@ -357,7 +370,6 @@ public final class Analyser {
 
             instructions.add(new Instruction(o));
         }
-        // throw new Error("Not implemented");
     }
 
     private void analyseFactor() throws CompileError {
@@ -376,7 +388,9 @@ public final class Analyser {
             //自定义变量
             Token n = next();
             int ofst = getOffset(n.getValueString(), n.getStartPos());
-            instructions.add(new Instruction(Operation.LOD, ofst ));
+            if(ofst < symbolTable.size()-1 )
+                instructions.add(new Instruction(Operation.LOD, ofst ));
+
         } else if (check(TokenType.Uint)) {
             // 无符号整数
             instructions.add(new Instruction(Operation.LIT,
@@ -386,7 +400,7 @@ public final class Analyser {
             // 表达式
             next();
             analyseExpression();
-            nextIf(TokenType.RParen);
+            expect(TokenType.RParen);
         } else {
             // 都不是，摸了
             throw new ExpectedTokenError(List.of(TokenType.Ident, TokenType.Uint, TokenType.LParen), next());
@@ -395,6 +409,5 @@ public final class Analyser {
         if (negate) {
             instructions.add(new Instruction(Operation.SUB));
         }
-        //throw new Error("Not implemented");
     }
 }
