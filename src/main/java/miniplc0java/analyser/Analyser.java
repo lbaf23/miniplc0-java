@@ -338,15 +338,13 @@ public final class Analyser {
 
         int ofst = getOffset(nameToken.getValueString(), nameToken.getStartPos());
 
-        // TODO
-        //if(ofst < symbolTable.size()-1)
+        //TODO
+        var nameSymbol = this.symbolTable.get(nameToken.getValueString());
+        if(!nameSymbol.isInitialized())
+            declareSymbol(nameToken.getValueString(),nameToken.getStartPos());
+
         instructions.add(new Instruction(Operation.STO, ofst));
 
-        /*
-        while (nextIf(TokenType.Ident) != null) {
-            // 变量名
-        }
-*/
     }
 
     private void analyseOutputStatement() throws CompileError {
@@ -394,7 +392,11 @@ public final class Analyser {
             //自定义变量
             Token n = next();
             int ofst = getOffset(n.getValueString(), n.getStartPos());
-            // TODO
+
+            var nameSymbol = this.symbolTable.get(n.getValueString());
+            if(!nameSymbol.isInitialized())
+                throw new AnalyzeError(ErrorCode.NotInitialized, n.getStartPos());
+
             //if(ofst < symbolTable.size()-1 )
             instructions.add(new Instruction(Operation.LOD, ofst ));
 
